@@ -8,6 +8,7 @@ import { TextField,
          FormControlLabel,
          Checkbox, }   from '@mui/material';
 import backgroundImage from '../../assets/background.jpg';
+import ezis_logo_white from '../../assets/ezis_logo_white.svg';
 import { useLogin }    from '../../hooks/useLogin';
 
 function Login() {
@@ -46,26 +47,6 @@ function Login() {
           p={4}
           boxSizing="border-box"
         >
-          {/* 좌측 고정 로고 */}
-          <Box
-            position="fixed"
-            left={0}
-            top="50%"
-            sx={{ transform: 'translateY(-50%)' }}
-            height={1000}
-            width={1000}
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            bgcolor="transparent"
-            p={2}
-          >
-            <img
-              src="/bonobono.jpg"
-              alt="Logo"
-              style={{ maxWidth: '100%', maxHeight: '100%' }}
-            />
-          </Box>
           {/* 좌측 로고 */}
           <Box
             flexShrink={0}
@@ -76,7 +57,7 @@ function Login() {
             height="200px"
             width="200px"
           >
-            <img src="/gora.png" alt="Logo" style={{ maxWidth: '100%', maxHeight: '100%' }} />
+            <img src={ezis_logo_white} alt="Logo" style={{ maxWidth: '100%', maxHeight: '100%' }} />
           </Box>
           {/* 로그인 폼 */}
           <Box
@@ -156,6 +137,7 @@ function Login() {
                   />
                 }
                 label="Remember ID"
+                sx={{color: 'white'}}
               />
             </Box>
             <Button
