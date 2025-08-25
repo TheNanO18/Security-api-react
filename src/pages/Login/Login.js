@@ -27,46 +27,46 @@ function Login() {
       <CssBaseline />
       <div
         style={{
-          backgroundImage: `url(${backgroundImage})`,
-          backgroundSize: 'cover',
+          backgroundImage   : `url(${backgroundImage})`,
+          backgroundSize    : 'cover',
           backgroundPosition: 'center',
-          height: '100vh',
-          width: '100vw',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          height            : '100vh',
+          width             : '100vw',
+          display           : 'flex',
+          alignItems        : 'center',
+          justifyContent    : 'center',
         }}
       >
         <Box
-          width="100vw"
-          height="100vh"
-          display="flex"
-          flexDirection="row"
-          alignItems="center"
+          width         ="100vw"
+          height        ="100vh"
+          display       ="flex"
+          flexDirection ="row"
+          alignItems    ="center"
           justifyContent="flex-end"
-          p={4}
-          boxSizing="border-box"
+          p             ={4}
+          boxSizing     ="border-box"
         >
           {/* 좌측 로고 */}
           <Box
-            flexShrink={0}
-            mr={4}
-            display="flex"
+            flexShrink    ={0}
+            mr            ={4}
+            display       ="flex"
             justifyContent="center"
-            alignItems="center"
-            height="200px"
-            width="200px"
+            alignItems    ="center"
+            height        ="200px"
+            width         ="200px"
           >
             <img src={ezis_logo_white} alt="Logo" style={{ maxWidth: '100%', maxHeight: '100%' }} />
           </Box>
           {/* 로그인 폼 */}
           <Box
-            component="form"
-            onSubmit={handleSubmit}
-            width="400px"
-            display="flex"
+            component    ="form"
+            onSubmit     ={handleSubmit}
+            width        ="400px"
+            display      ="flex"
             flexDirection="column"
-            alignItems="flex-end"
+            alignItems   ="flex-end"
           >
             <Typography variant="h4" gutterBottom sx={{ color: '#1976d2' }}>
               Log In
@@ -79,11 +79,11 @@ function Login() {
               value={id}
               onChange={(e) => setId(e.target.value)} 
               sx={{
-                '& .MuiInputBase-root': { backgroundColor: '#fff' },
-                '& label': { color: '#1976d2' },
+                '& .MuiInputBase-root'    : { backgroundColor: '#fff' },
+                '& label'                 : { color: '#1976d2' },
                 '& .MuiOutlinedInput-root': {
-                  '& fieldset': { borderColor: '#1976d2' },
-                  '&:hover fieldset': { borderColor: '#1565c0' },
+                  '& fieldset'            : { borderColor: '#1976d2' },
+                  '&:hover fieldset'      : { borderColor: '#1565c0' },
                   '&.Mui-focused fieldset': { borderColor: '#0d47a1' },
                 },
               }}
@@ -97,30 +97,30 @@ function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               sx={{
-                  '& .MuiInputBase-root': { backgroundColor: '#fff' },
-                  '& label': { color: '#1976d2' },
-                  '& .MuiOutlinedInput-root': {
-                  '& fieldset': { borderColor: '#1976d2' },
-                  '&:hover fieldset': { borderColor: '#1565c0' },
-                  '&.Mui-focused fieldset': { borderColor: '#0d47a1' },
+                '& .MuiInputBase-root'     : { backgroundColor: '#fff' },
+                '& label'                  : { color: '#1976d2' },
+                '& .MuiOutlinedInput-root' : {
+                  '& fieldset'             : { borderColor: '#1976d2' },
+                  '&:hover fieldset'       : { borderColor: '#1565c0' },
+                  '&.Mui-focused fieldset' : { borderColor: '#0d47a1' },
                 },
               }}
             />
             <Box
-              display="flex"
+              display       ="flex"
               justifyContent="space-between"
-              alignItems="center"
-              width="100%"
-              mt={1}
+              alignItems    ="center"
+              width         ="100%"
+              mt            ={1}
             >
               {/* ◀️ "SIGN IN" 버튼을 "Sign Up"으로 변경하고 Link로 감싸기 */}
               <Button
                 component={Link}
                 to="/register" // 이동할 경로 지정
                 sx={{
-                  color: '#115293',
-                  textTransform: 'none', // 대문자 변환 제거
-                  '&:hover': {
+                  color            : '#115293',
+                  textTransform    : 'none', // 대문자 변환 제거
+                  '&:hover'        : {
                     backgroundColor: 'transparent',
                   },
                 }}
@@ -130,9 +130,9 @@ function Login() {
               <FormControlLabel
                 control={
                   <Checkbox
-                    value="remember"
-                    color="primary"
-                    checked={rememberId}
+                    value   ="remember"
+                    color   ="primary"
+                    checked ={rememberId}
                     onChange={(e) => setRememberId(e.target.checked)}
                   />
                 }
@@ -141,9 +141,9 @@ function Login() {
               />
             </Box>
             <Button
-              type="submit"
+              type   ="submit"
               variant="contained"
-              color="primary"
+              color  ="primary"
               fullWidth
               sx={{ mt: 2 }}
             >

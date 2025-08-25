@@ -96,11 +96,11 @@ export default function Dashboard() {
       <AppBar position="fixed" open={open}>
         <Toolbar>
           <IconButton
-            color="inherit"
+            color     ="inherit"
             aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{ marginRight: 5, ...(open && { display: 'none' }) }}
+            onClick   ={handleDrawerOpen}
+            edge      ="start"
+            sx        ={{ marginRight: 5, ...(open && { display: 'none' }) }}
           >
             <MenuIcon />
           </IconButton>
@@ -113,9 +113,9 @@ export default function Dashboard() {
         {/* Drawer 내부에 Box를 추가하여 flexbox 레이아웃을 적용 */}
         <Box
           sx={{
-            display: 'flex',
+            display      : 'flex',
             flexDirection: 'column',
-            height: '100%',
+            height       : '100%',
           }}
         >
           <div>
@@ -130,7 +130,7 @@ export default function Dashboard() {
               {topMenuItems.map((item) => (
                 <ListItem key={item.text} disablePadding sx={{ display: 'block' }}>
                   <ListItemButton onClick={() => handleMenuClick(item.path)} /* ... */ >
-                    <ListItemIcon /* ... */ >{item.icon}</ListItemIcon>
+                    <ListItemIcon>{item.icon}</ListItemIcon>
                     <ListItemText primary={item.text} sx={{ opacity: open ? 1 : 0 }} />
                   </ListItemButton>
                 </ListItem>

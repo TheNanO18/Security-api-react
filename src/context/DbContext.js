@@ -7,7 +7,7 @@ export const DbContext = createContext();
 export const DbProvider = ({ children }) => {
   // DB 접속 정보를 저장할 state. 초기값은 비워두거나 기본값으로 설정.
   const [dbConfig, setDbConfig] = useState({
-    url: 'jdbc:postgresql://localhost:5432/postgres',
+    url : 'jdbc:postgresql://localhost:5432/postgres',
     user: 'postgres',
     pass: '',
   });

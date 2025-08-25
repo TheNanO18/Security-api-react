@@ -3,11 +3,11 @@ import React from 'react';
 function Api() {
   return (
     <div style={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        height: '100vh', 
-        color: 'white', 
-        backgroundColor: 'transparent' // ✨ 이 부분을 수정했습니다.
+        display        : 'flex', 
+        flexDirection  : 'column', 
+        height         : '100vh', 
+        color          : 'white', 
+        backgroundColor: 'transparent'
     }}>
       {/* 상단 50% */}
       <div style={{ flex: 1, border: '1px solid white', textAlign: 'center' }}>

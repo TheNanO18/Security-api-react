@@ -4,16 +4,16 @@ import { DbContext } from '../context/DbContext';
 // Custom Hook은 항상 'use'로 시작하는 이름을 가집니다.
 export const useSetting = () => {
   // 1. 기존의 모든 상태와 컨텍스트 로직을 이곳으로 옮깁니다.
-  const { setDbConfig } = useContext(DbContext);
-  const [dbHost, setDbHost] = useState('localhost:5432/postgres');
-  const [dbUser, setDbUser] = useState('postgres');
+  const { setDbConfig }             = useContext(DbContext);
+  const [dbHost, setDbHost]         = useState('localhost:5432/postgres');
+  const [dbUser, setDbUser]         = useState('postgres');
   const [dbPassword, setDbPassword] = useState('');
-  const [alertInfo, setAlertInfo] = useState({ show: false, severity: 'success', message: '' });
+  const [alertInfo, setAlertInfo]   = useState({ show: false, severity: 'success', message: '' });
 
   // 2. 이벤트 핸들러 로직도 그대로 가져옵니다.
   const handleSave = () => {
     const newDbConfig = {
-      url: `jdbc:postgresql://${dbHost}`,
+      url : `jdbc:postgresql://${dbHost}`,
       user: dbUser,
       pass: dbPassword,
     };

@@ -5,9 +5,9 @@ import { useRememberId } from './useRememberId';
 
 export function useLogin() {
   const { id, setId, rememberId, setRememberId } = useRememberId();
-  const [password, setPassword] = useState('');
-  const navigate = useNavigate();
-  const { login } = useAuth();
+  const [password, setPassword]                  = useState('');
+  const navigate                                 = useNavigate();
+  const { login }                                = useAuth();
 
   const handleLogin = async () => {
     if (rememberId) {
@@ -19,6 +19,7 @@ export function useLogin() {
 
     if (!id || !password) {
       alert('아이디와 비밀번호를 입력해주세요.');
+      
       return;
     }
 

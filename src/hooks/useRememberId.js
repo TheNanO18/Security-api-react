@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 
 export function useRememberId() {
-  const [id, setId] = useState('');
+  const [id, setId]                 = useState('');
   const [rememberId, setRememberId] = useState(false);
 
   useEffect(() => {
-    const rememberedId = localStorage.getItem('rememberId');
+    const rememberedId    = localStorage.getItem('rememberId');
     const initialRemember = rememberedId ? true : false;
     
     if (initialRemember) {

@@ -1,13 +1,11 @@
-// src/hooks/useRegister.js
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export const useRegister = () => {
-  const [id, setId] = useState('');
-  const [password, setPassword] = useState('');
+  const [id, setId]                           = useState('');
+  const [password, setPassword]               = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const navigate = useNavigate();
+  const navigate                              = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();

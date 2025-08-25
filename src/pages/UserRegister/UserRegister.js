@@ -26,11 +26,11 @@ function UserRegister() {
 
   // TextField에 재사용될 스타일 객체
   const textFieldStyles = {
-    '& .MuiInputBase-root': { backgroundColor: '#fff' },
-    '& label': { color: '#1972d2' },
+    '& .MuiInputBase-root'    : { backgroundColor: '#fff' },
+    '& label'                 : { color: '#1972d2' },
     '& .MuiOutlinedInput-root': {
-      '& fieldset': { borderColor: '#1972d2' },
-      '&:hover fieldset': { borderColor: '#1565c0' },
+      '& fieldset'            : { borderColor: '#1972d2' },
+      '&:hover fieldset'      : { borderColor: '#1565c0' },
       '&.Mui-focused fieldset': { borderColor: '#0d47a1' },
     },
   };
@@ -40,27 +40,27 @@ function UserRegister() {
       <CssBaseline />
       <div
         style={{
-          backgroundImage: `url(${backgroundImage})`,
-          backgroundSize: 'cover',
+          backgroundImage   : `url(${backgroundImage})`,
+          backgroundSize    : 'cover',
           backgroundPosition: 'center',
-          height: '100vh',
-          width: '100vw',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          height            : '100vh',
+          width             : '100vw',
+          display           : 'flex',
+          alignItems        : 'center',
+          justifyContent    : 'center',
         }}
       >
         <Box
-          component="form"
-          onSubmit={handleSubmit}
-          width="400px"
-          display="flex"
+          component    ="form"
+          onSubmit     ={handleSubmit}
+          width        ="400px"
+          display      ="flex"
           flexDirection="column"
-          alignItems="center" 
-          p={4}
-          borderRadius={2}
-          bgcolor="rgba(255, 255, 255, 0.8)"
-          boxShadow={3}
+          alignItems   ="center" 
+          p            ={4}
+          borderRadius ={2}
+          bgcolor      ="rgba(255, 255, 255, 0.8)"
+          boxShadow    ={3}
         >
           <Typography variant="h4" gutterBottom sx={{ color: '#1972d2', alignSelf: 'center' }}>
             Sign Up
@@ -72,16 +72,18 @@ function UserRegister() {
             margin="normal"
             value={id}
             onChange={(e) => setId(e.target.value)}
+
             sx={textFieldStyles}
           />
           <TextField
             label="Password"
-            type="password"
+            type ="password"
             required
             fullWidth
             margin="normal"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+
             sx={textFieldStyles}
           />
           <TextField
@@ -92,21 +94,24 @@ function UserRegister() {
             margin="normal"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
+
             sx={textFieldStyles}
           />
           <Button
-            type="submit"
+            type   ="submit"
             variant="contained"
-            color="primary"
+            color  ="primary"
             fullWidth
+
             sx={{ mt: 2, mb: 2 }}
           >
             Create Account
           </Button>
           <Button
             component={Link}
-            to="/login"
+            to       ="/login"
             fullWidth
+            
             sx={{ color: '#115293' }}
           >
             Back to Log In
