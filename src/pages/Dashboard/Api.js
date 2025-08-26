@@ -15,6 +15,7 @@ import SendIcon from '@mui/icons-material/Send';
 import AddIcon from '@mui/icons-material/Add';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow'; // ✅ 버튼 아이콘 임포트
 
 // 드롭다운 메뉴에서 사용할 옵션 목록
 const modeOptions = [
@@ -159,11 +160,10 @@ function Api() {
           </Button>
         </Box>
         
-        {isLoading && <p>데이터를 불러오는 중입니다...</p>}
         {error && <p style={{ color: 'red' }}>{error}</p>}
         
         {tableData.length > 0 && (
-          <Paper sx={{ flexGrow: 1, minHeight: 0, backgroundColor: 'rgba(255, 255, 255, 0.1)' }}>
+          <Paper sx={{ flexGrow: 1, minHeight: 0, backgroundColor: 'rgba(255, 255, 255, 0.1)', display: 'flex', flexDirection: 'column' }}>
             <DataGrid
               rows={tableData}
               columns={columns}
@@ -173,10 +173,21 @@ function Api() {
               pageSizeOptions={[5, 10, 20]}
               checkboxSelection
               sx={{ 
+                flexGrow: 1,
                 color: 'white', 
                 border: 0, 
                 '& .MuiDataGrid-cell, & .MuiDataGrid-columnHeaders': { borderColor: 'rgba(255, 255, 255, 0.3)'}, 
-                '& .MuiSvgIcon-root': { color: 'white' } 
+                '& .MuiSvgIcon-root': { color: 'white' },
+                '& .MuiDataGrid-cellContent': {
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                },
+                '& .MuiDataGrid-columnHeaderTitle': {
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                },
               }}
             />
           </Paper>
@@ -187,11 +198,13 @@ function Api() {
       <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '10px', minWidth: 0 }}>
         <Box sx={{ flex: 1, border: '1px solid white', padding: '20px', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
           <h3>암/복호화 대상 컬럼 선택</h3>
-          {tableData.length > 0 ? (
-            <ColumnTransferList
-              columns={headers}
-            />
-          ) : ( <p>테이블을 먼저 조회해주세요.</p> )}
+          <Box sx={{ flex: 1, minHeight: 0 }}>
+            {tableData.length > 0 ? (
+              <ColumnTransferList
+                columns={headers}
+              />
+            ) : ( <p>테이블을 먼저 조회해주세요.</p> )}
+          </Box>
         </Box>
         
         <Box sx={{ flex: 1, border: '1px solid white', padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px', minHeight: 0 }}>
@@ -220,6 +233,18 @@ function Api() {
             value={selectedPasswordHash}
             onChange={handlePasswordHashChange}
           />
+
+          {/* ✅ 요청하신 Send 버튼 UI만 추가 */}
+          <Button
+            variant="contained"
+            color="success"
+            startIcon={<PlayArrowIcon />}
+            onClick={() => alert('Send 버튼 클릭!')} // 기능 없이 알림창만 띄웁니다.
+            disabled={tableData.length === 0}
+            sx={{ mt: 'auto' }} // 버튼을 영역 하단에 배치
+          >
+            Send
+          </Button>
         </Box>
       </Box>
 
@@ -229,15 +254,12 @@ function Api() {
           <Typography variant="h6" component="h2">
             패스워드 해싱 설정
           </Typography>
-          
           <DistinctSelect
             label="해싱 알고리즘"
             options={algoInModalOptions}
             value={algoInModal}
             onChange={setAlgoInModal}
           />
-
-          {/* ✅ 2. 컬럼명을 입력받을 TextField 추가 */}
           <TextField
             label="해싱할 패스워드 컬럼명"
             variant="outlined"
@@ -245,7 +267,7 @@ function Api() {
             onChange={(e) => setPasswordColumn(e.target.value)}
             fullWidth
             sx={{ 
-              mt: 2, // 상단 여백 추가
+              mt: 2,
               '& .MuiInputBase-root': { backgroundColor: 'white' } 
             }}
           />

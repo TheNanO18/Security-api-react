@@ -15,7 +15,8 @@ function App() {
   return (
      <div
       style={{
-        backgroundImage: `url(${backgroundImage})`,  // import한 이미지 사용
+        backgroundImage: `url(${backgroundImage})`, // 기존 코드
+        backgroundAttachment: 'fixed',             // ✅ 이 한 줄을 추가하세요.
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         minHeight: '100vh',
