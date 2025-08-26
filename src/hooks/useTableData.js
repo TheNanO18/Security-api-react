@@ -26,15 +26,26 @@ export const useTableData = () => {
     setHeaders([]);
 
     try {
-      // ✅ API로 보내기 직전에 tableName을 소문자로 변환합니다.
       const lowercasedTableName = tableName.toLowerCase();
-
-      // ✅ 변환된 소문자 테이블 이름으로 API를 호출합니다.
       const data = await TableDataAPI(lowercasedTableName, dbConfig);
 
       if (data && data.length > 0) {
-        setHeaders(Object.keys(data[0]));
+        // ✅ 1. 서버에서 받은 원본 컬럼 목록을 가져옵니다.
+        const initialHeaders = Object.keys(data[0]);
+
+        // ✅ 2. 'uuid'를 제외한 나머지 컬럼들로 새 배열을 만듭니다.
+        const otherHeaders = initialHeaders.filter(header => header !== 'uuid');
+        
+        // ✅ 3. 원본 컬럼 목록에 'uuid'가 있었다면, 새 배열의 맨 앞에 'uuid'를 추가합니다.
+        //    만약 'uuid'가 없다면 원본 순서를 그대로 사용합니다.
+        const sortedHeaders = initialHeaders.includes('uuid')
+          ? ['uuid', ...otherHeaders]
+          : initialHeaders;
+
+        // ✅ 4. 최종적으로 정렬된 컬럼 목록으로 상태를 설정합니다.
+        setHeaders(sortedHeaders);
         setTableData(data);
+        
       } else {
         setError('테이블이 비어있거나 존재하지 않습니다.');
       }
