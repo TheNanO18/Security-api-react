@@ -1,9 +1,8 @@
-import { useState, useCallback, useContext } from 'react'; // ✅ useContext 추가
+import { useState, useCallback, useContext } from 'react';
 import { TableDataAPI } from '../services/apiService';
-import { DbContext } from '../context/DbContext'; // ✅ DbContext 추가
+import { DbContext } from '../context/DbContext';
 
 export const useTableData = () => {
-  // 1. useContext를 사용해 dbConfig를 가져옵니다.
   const { dbConfig } = useContext(DbContext);
 
   const [tableData, setTableData] = useState([]);
@@ -16,7 +15,6 @@ export const useTableData = () => {
       setError('테이블 명이 필요합니다.');
       return;
     }
-    // dbConfig가 비어있는 경우에 대한 유효성 검사 추가
     if (!dbConfig || !dbConfig.url) {
       setError('DB 설정이 필요합니다. 로그인 페이지에서 설정을 저장해주세요.');
       return;
@@ -28,8 +26,11 @@ export const useTableData = () => {
     setHeaders([]);
 
     try {
-      // 2. API 호출 시 dbConfig를 함께 전달합니다.
-      const data = await TableDataAPI(tableName, dbConfig);
+      // ✅ API로 보내기 직전에 tableName을 소문자로 변환합니다.
+      const lowercasedTableName = tableName.toLowerCase();
+
+      // ✅ 변환된 소문자 테이블 이름으로 API를 호출합니다.
+      const data = await TableDataAPI(lowercasedTableName, dbConfig);
 
       if (data && data.length > 0) {
         setHeaders(Object.keys(data[0]));
