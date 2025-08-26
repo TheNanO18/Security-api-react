@@ -1,19 +1,25 @@
 import { useState, useContext } from 'react';
 import { DbContext } from '../context/DbContext';
 
-// Custom Hook은 항상 'use'로 시작하는 이름을 가집니다.
 export const useSetting = () => {
-  // 1. 기존의 모든 상태와 컨텍스트 로직을 이곳으로 옮깁니다.
-  const { setDbConfig }             = useContext(DbContext);
-  const [dbHost, setDbHost]         = useState('localhost:5432/postgres');
-  const [dbUser, setDbUser]         = useState('postgres');
-  const [dbPassword, setDbPassword] = useState('');
-  const [alertInfo, setAlertInfo]   = useState({ show: false, severity: 'success', message: '' });
+  // 1. Context에서 현재 저장된 dbConfig 값을 가져옵니다.
+  const { dbConfig, setDbConfig } = useContext(DbContext);
 
-  // 2. 이벤트 핸들러 로직도 그대로 가져옵니다.
+  // URL에서 "jdbc:postgresql://" 부분을 제거하는 간단한 함수
+  const getHostFromUrl = (url) => {
+    if (!url) return 'localhost:5432/postgres';
+    return url.replace('jdbc:postgresql://', '');
+  };
+
+  // 2. Context의 값으로 useState의 초기값을 설정합니다.
+  const [dbHost, setDbHost] = useState(getHostFromUrl(dbConfig.url));
+  const [dbUser, setDbUser] = useState(dbConfig.user || 'postgres');
+  const [dbPassword, setDbPassword] = useState(dbConfig.pass || '');
+  const [alertInfo, setAlertInfo] = useState({ show: false, severity: 'success', message: '' });
+
   const handleSave = () => {
     const newDbConfig = {
-      url : `jdbc:postgresql://${dbHost}`,
+      url: `jdbc:postgresql://${dbHost}`,
       user: dbUser,
       pass: dbPassword,
     };
@@ -21,16 +27,9 @@ export const useSetting = () => {
     setAlertInfo({ show: true, severity: 'success', message: 'DB 설정이 앱에 저장되었습니다.' });
   };
 
-  // 3. 컴포넌트(Setting.js)에서 사용할 값들과 함수들을 객체로 묶어 반환합니다.
   return {
-    dbHost,
-    dbUser,
-    dbPassword,
-    alertInfo,
-    setDbHost,
-    setDbUser,
-    setDbPassword,
-    setAlertInfo,
+    dbHost, dbUser, dbPassword, alertInfo,
+    setDbHost, setDbUser, setDbPassword, setAlertInfo,
     handleSave,
   };
 };

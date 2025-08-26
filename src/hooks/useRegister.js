@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { registerUserAPI } from '../services/apiService'; // ✅ apiService에서 함수 임포트
 
 export const useRegister = () => {
-  const [id, setId]                           = useState('');
-  const [password, setPassword]               = useState('');
+  const [id, setId] = useState('');
+  const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const navigate                              = useNavigate();
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -16,26 +17,22 @@ export const useRegister = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:8120/register', { // 백엔드 주소
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ id, password }),
-      });
+      // ✅ fetch 대신 중앙 API 함수 호출
+      await registerUserAPI(id, password);
 
-      if (response.status === 201) {
-        alert('회원가입이 성공적으로 완료되었습니다. 로그인 페이지로 이동합니다.');
-        navigate('/login'); // 성공 시 로그인 페이지로 이동
-      } else if (response.status === 409) {
-        const data = await response.json();
-        alert(data.error || '이미 존재하는 아이디입니다.');
-      } else {
-        throw new Error('회원가입에 실패했습니다.');
-      }
+      // 성공 시 (apiClient에서 에러를 던지지 않은 경우)
+      alert('회원가입이 성공적으로 완료되었습니다. 로그인 페이지로 이동합니다.');
+      navigate('/login');
+
     } catch (error) {
       console.error('Registration error:', error);
-      alert('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      
+      // ✅ 개선된 apiClient 덕분에 상태 코드로 분기 처리 가능
+      if (error.status === 409) {
+        alert('이미 존재하는 아이디입니다.');
+      } else {
+        alert(error.message || '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      }
     }
   };
 

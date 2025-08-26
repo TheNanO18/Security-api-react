@@ -6,12 +6,24 @@ import { TextField,
          CssBaseline,
          Button,
          FormControlLabel,
-         Checkbox, }   from '@mui/material';
+         Checkbox, Alert,
+        Stack }   from '@mui/material';
 import backgroundImage from '../../assets/background.jpg';
 import ezis_logo_white from '../../assets/ezis_logo_white.svg';
+import { useSetting }  from '../../hooks/useSetting';
 import { useLogin }    from '../../hooks/useLogin';
 
+import SaveIcon                from '@mui/icons-material/Save';
+
+
+
 function Login() {
+  const {
+    dbHost, dbUser, dbPassword, alertInfo,
+    setDbHost, setDbUser, setDbPassword, setAlertInfo,
+    handleSave,
+  } = useSetting();
+
   const {
     id,
     password,
@@ -34,12 +46,94 @@ function Login() {
           width             : '100vw',
           display           : 'flex',
           alignItems        : 'center',
-          justifyContent    : 'center',
+          justifyContent    : 'space-between',
         }}
       >
+        <Box 
+          sx={{ 
+            // flex: 1 대신 명시적인 너비 지정
+            width          : '450px', 
+            maxWidth       : '500px',
+            padding        : '2rem',
+            borderRadius   : '8px', // 모서리 둥글게
+          }}
+        >
+          <Stack spacing={3}>
+            <Typography variant="h5" sx={{ color: 'white' }}>
+              Database Setting
+            </Typography>
+            <TextField
+              label="Database Host / DB Name"
+              fullWidth
+              value={dbHost}
+              onChange={(e) => setDbHost(e.target.value)}
+
+              sx={{
+                '& label'                 : { color: 'rgba(255, 255, 255, 0.9)' },
+                '& .MuiInputBase-root'    : { color: 'white', backgroundColor: 'rgba(105, 94, 94, 0.9)' },
+                '& label.Mui-focused'     : { color: 'rgba(138, 180, 248, 1)' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset'            : { borderColor: 'rgba(255, 255, 255, 0.7)' },
+                  '&:hover fieldset'      : { borderColor: 'white' },
+                  '&.Mui-focused fieldset': { borderColor: 'rgba(138, 180, 248, 1)' },
+                },
+              }}
+            />
+            <TextField
+              label="User"
+              fullWidth
+              value={dbUser}
+              onChange={(e) => setDbUser(e.target.value)}
+
+              sx={{
+                '& label'                 : { color: 'rgba(255, 255, 255, 0.9)' },
+                '& .MuiInputBase-root'    : { color: 'white', backgroundColor: 'rgba(105, 94, 94, 0.9)' },
+                '& label.Mui-focused'     : { color: 'rgba(138, 180, 248, 1)' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset'            : { borderColor: 'rgba(255, 255, 255, 0.7)' },
+                  '&:hover fieldset'      : { borderColor: 'white' },
+                  '&.Mui-focused fieldset': { borderColor: 'rgba(138, 180, 248, 1)' },
+                },
+              }}
+            />
+            <TextField
+              label="Password"
+              type ="password"
+              fullWidth
+              value={dbPassword}
+              onChange={(e) => setDbPassword(e.target.value)}
+
+              sx={{
+                '& label'                 : { color: 'rgba(255, 255, 255, 0.9)' },
+                '& .MuiInputBase-root'    : { color: 'white', backgroundColor: 'rgba(105, 94, 94, 0.9)' },
+                '& label.Mui-focused'     : { color: 'rgba(138, 180, 248, 1)' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset'            : { borderColor: 'rgba(255, 255, 255, 0.7)' },
+                  '&:hover fieldset'      : { borderColor: 'white' },
+                  '&.Mui-focused fieldset': { borderColor: 'rgba(138, 180, 248, 1)' },
+                },
+              }}
+            />
+            {alertInfo.show && (
+              <Alert severity={alertInfo.severity} onClose={() => setAlertInfo({ ...alertInfo, show: false })}>
+                {alertInfo.message}
+              </Alert>
+            )}
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Button
+                variant  ="contained"
+                startIcon={<SaveIcon />}
+                onClick  ={handleSave}
+
+                sx={{ textTransform: 'none' }}
+              >
+                Setting Save
+              </Button>
+            </Box>
+          </Stack>
+        </Box>
+
         <Box
-          width         ="100vw"
-          height        ="100vh"
           display       ="flex"
           flexDirection ="row"
           alignItems    ="center"
