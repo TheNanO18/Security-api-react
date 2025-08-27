@@ -14,7 +14,8 @@ export const useSecurityData = () => {
     const jsonData = JSON.stringify(requestData, null, 2);
 
     // 2. 1차 목표: alert으로 데이터 확인
-    alert(jsonData);
+  
+    console.log(jsonData);
 
     // 3. 2차 목표: API 호출 (현재는 주석 처리)
     // setIsLoading(true);

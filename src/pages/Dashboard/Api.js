@@ -101,26 +101,41 @@ function Api() {
     }, [tableData, selectedUuids]);
 
     const handleSendRequest = () => {
-        if (selectedUuids.length === 0) {
-            alert('데이터 테이블에서 암/복호화할 행을 먼저 선택해주세요.');
-            return;
-        }
-        if (targetColumns.length === 0) {
-            alert('암/복호화 대상 컬럼을 선택해주세요.');
-            return;
+      if (selectedUuids.length === 0) {
+          alert('데이터 테이블에서 암/복호화할 행을 먼저 선택해주세요.');
+          return;
+      }
+      if (targetColumns.length === 0) {
+          alert('암/복호화 대상 컬럼을 선택해주세요.');
+          return;
+      }
+      const tableDataMap = new Map(tableData.map(row => [row.uuid, row]));
+      
+      const columnsString = targetColumns.join(', ')
+      const finalPayload = selectedUuids.map(uuid => {
+        const currentRow = tableDataMap.get(uuid);
+        if (!currentRow) return null; // Safety check in case the row is not found
+
+        const requestObject  = {
+            route_type: "api",
+            mode      : selectedMode,
+            info_type : selectedInfo,
+            uuid      : uuid,
+            col       : columnsString,
+            algo      : selectedAlgorithm,
+        };
+        if (selectedPasswordHash === 'T') {
+            requestObject.password = {
+                pass_algo: algoInModal,
+                value    : currentRow[passwordColumn] || "", 
+                column   : passwordColumn
+            };
         }
 
-        const requestData = {
-            uuids: selectedUuids,
-            columns: targetColumns,
-            mode: selectedMode,
-            info: selectedInfo,
-            algorithm: selectedAlgorithm,
-            passwordHash: selectedPasswordHash,
-            passwordHashAlgorithm: algoInModal,
-            passwordColumn: passwordColumn,
-        };
-        processData(requestData);
+        return requestObject;
+        }).filter(Boolean);
+
+        processData(finalPayload);
     };
 
     const handleSubmit = (event) => {
@@ -157,8 +172,6 @@ function Api() {
         }));
     }, [headers]);
 
-    console.log('Parent component knows the target columns are:', targetColumns);
-    
     return (
         <div style={{
             display: 'flex',
