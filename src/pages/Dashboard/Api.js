@@ -30,8 +30,8 @@ const algorithmOptions = [
 ];
 
 const infoOptions = [
-    { value: 'new', label: '기존 정보' },
-    { value: 'old', label: '새로운 정보' },
+    { value: 'old', label: '기존 정보' },
+    { value: 'new', label: '새로운 정보' },
 ];
 
 const passwordHashOptions = [
@@ -118,6 +118,7 @@ function Api() {
 
         const requestObject  = {
             route_type: "api",
+            table     : tableName.toLowerCase(),
             mode      : selectedMode,
             info_type : selectedInfo,
             uuid      : uuid,
@@ -135,7 +136,7 @@ function Api() {
         return requestObject;
         }).filter(Boolean);
 
-        processData(finalPayload);
+        processData(finalPayload, dbConfig);
     };
 
     const handleSubmit = (event) => {
@@ -152,22 +153,26 @@ function Api() {
     };
 
     const handleSaveNewData = async (newData) => {
-        try {
-            await addNewDataAPI(tableName.toLowerCase(), dbConfig, newData);
-            alert('데이터가 성공적으로 추가되었습니다.');
-            handleCloseAddModal();
-            getTable(tableName);
-        } catch (err) {
-            alert(`데이터 추가 실패: ${err.message}`);
-        }
+      try {
+        await addNewDataAPI(tableName.toLowerCase(), dbConfig, newData);
+        alert('데이터가 성공적으로 추가되었습니다.');
+        handleCloseAddModal();
+        
+        // ✅ Clear selections before refetching data
+        setSelectedUuids([]); 
+        
+        getTable(tableName);
+       } catch (err) {
+           alert(`데이터 추가 실패: ${err.message}`);
+       }
     };
-
     const columns = useMemo(() => {
         if (!headers || headers.length === 0) return [];
         return headers.map((header) => ({
             field: header,
             headerName: header.charAt(0).toUpperCase() + header.slice(1),
             width: header === 'uuid' ? 300 : 150,
+
             flex: 1,
         }));
     }, [headers]);

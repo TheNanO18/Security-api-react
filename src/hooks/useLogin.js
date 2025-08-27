@@ -2,6 +2,7 @@ import { useState }      from 'react';
 import { useNavigate }   from 'react-router-dom';
 import { useAuth }       from '../context/AuthContext';
 import { useRememberId } from './useRememberId';
+import { useDbContext } from '../context/DbContext';
 import { loginAPI }    from '../services/apiService';
 
 export function useLogin() {
@@ -9,6 +10,7 @@ export function useLogin() {
   const [password, setPassword]                  = useState('');
   const navigate                                 = useNavigate();
   const { login }                                = useAuth();
+  const {dbConfig}                               = useDbContext();
 
   const handleLogin = async () => {
     if (rememberId) {
@@ -26,7 +28,7 @@ export function useLogin() {
 
     try {
       // ✅ fetch를 직접 사용하는 대신, 만들어둔 loginAPI 함수를 호출
-      const token = await loginAPI(id, password);
+      const token = await loginAPI(id, password, dbConfig);
 
       if (token) {
         login();

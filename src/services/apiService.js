@@ -3,11 +3,11 @@ import apiClient from './apiClient';
 /**
  * 로그인 API 호출
  */
-export async function loginAPI(id, password) {
+export async function loginAPI(id, password, dbConfig) {
   const response = await fetch('/api/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username: id, password: password }),
+    body: JSON.stringify({ id: id, password: password, db_config: dbConfig }),
   });
 
   if (response.ok) {
@@ -23,8 +23,8 @@ export async function loginAPI(id, password) {
 /**
  * 회원가입 API 호출
  */
-export const registerUserAPI = (id, password) => {
-  return apiClient('/api/register', 'POST', { id, password });
+export const registerUserAPI = (id, password, dbConfig) => {
+  return apiClient('/api/register', 'POST', { id, password, db_config: dbConfig });
 };
 
 /**
@@ -42,6 +42,19 @@ export const addNewDataAPI = (tableName, dbConfig, newData) => {
   return apiClient('/api/new-data', 'POST', { tableName, db_config: dbConfig, data: newData });
 };
 
-export const ProcessAPI = (securityData, dbConfig) => {
-  return apiClient('/api/process', 'POST', { data: securityData, db_config: dbConfig });
+/**
+ * Sends the security processing request to the server.
+ * @param {Array<object>} payload - The array of objects to be processed.
+ * @param {object} dbConfig - The database configuration.
+ * @returns {Promise<any>} The server's response.
+ */
+export const securityProcessAPI = (payload, dbConfig) => {
+  // ✅ Create a new body object that includes both the dbConfig and the original payload.
+  const body = {
+    db_config: dbConfig,
+    requests: payload
+  };
+
+  // Send this new combined object to the server.
+  return apiClient('/api/process', 'POST', body);
 };
