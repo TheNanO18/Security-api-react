@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import { useTableData } from '../../hooks/useTableData';
 import ColumnTransferList from '../../components/ColumnTransferList';
 import DistinctSelect from '../../components/DistinctSelect';
 import AddDataModal from '../../components/AddDataModal';
 import { addNewDataAPI } from '../../services/apiService';
 import { useDbContext } from '../../context/DbContext';
+import { useTableData } from '../../hooks/useTableData';
+import { useSecurityData } from '../../hooks/useSecurityData';
 
 import { DataGrid } from '@mui/x-data-grid';
 import Paper from '@mui/material/Paper';
@@ -15,7 +16,7 @@ import SendIcon from '@mui/icons-material/Send';
 import AddIcon from '@mui/icons-material/Add';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow'; // ✅ 버튼 아이콘 임포트
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
 // 드롭다운 메뉴에서 사용할 옵션 목록
 const modeOptions = [
@@ -59,9 +60,14 @@ const algoInModalOptions = [
 ];
 
 function Api() {
-  const { dbConfig } = useDbContext();
   const [tableName, setTableName] = useState('');
+  const { dbConfig } = useDbContext();
   const { tableData, headers, isLoading, error, getTable } = useTableData();
+
+  const [selectedUuids, setSelectedUuids] = useState([]); // DataGrid에서 선택된 row의 uuid 목록
+  const [targetColumns, setTargetColumns] = useState([]); // ColumnTransferList의 오른쪽 목록
+  const { processData, isLoading: isProcessing, error: processingError } = useSecurityData();
+
   
   // 오른쪽 패널 상태
   const [selectedMode, setSelectedMode] = useState('');
@@ -84,8 +90,37 @@ function Api() {
   // 페이지네이션 상태
   const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 5 });
 
+  const handleSendRequest = () => {
+    if (selectedUuids.length === 0) {
+      alert('데이터 테이블에서 암/복호화할 행을 먼저 선택해주세요.');
+      return;
+    }
+    if (targetColumns.length === 0) {
+      alert('암/복호화 대상 컬럼을 선택해주세요.');
+      return;
+    }
+
+    // 요청에 필요한 모든 데이터를 모아 JSON 객체를 만듭니다.
+    const requestData = {
+      // uuids: selectedUuids,
+      columns: targetColumns,
+      mode: selectedMode,
+      info: selectedInfo,
+      algorithm: selectedAlgorithm,
+      passwordHash: selectedPasswordHash,
+      // 비밀번호 해시 모달에서 설정한 값들도 필요하다면 추가
+      passwordHashAlgorithm: algoInModal,
+      passwordColumn: passwordColumn,
+    };
+
+    // useSecurityData 훅의 processData 함수를 호출합니다.
+    processData(requestData);
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
+    setSelectedUuids([]);
+    
     getTable(tableName);
   };
   
@@ -172,6 +207,10 @@ function Api() {
               onPaginationModelChange={setPaginationModel}
               pageSizeOptions={[5, 10, 20]}
               checkboxSelection
+              onRowSelectionModelChange={(newSelectionModel) => {
+                setSelectedUuids(newSelectionModel);
+              }}
+              rowSelectionModel={selectedUuids}
               sx={{ 
                 flexGrow: 1,
                 color: 'white', 
@@ -197,53 +236,58 @@ function Api() {
       {/* 2. 오른쪽 영역 (20%) */}
       <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '10px', minWidth: 0 }}>
         <Box sx={{ flex: 1, border: '1px solid white', padding: '20px', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-          <h3>암/복호화 대상 컬럼 선택</h3>
-          <Box sx={{ flex: 1, minHeight: 0 }}>
-            {tableData.length > 0 ? (
-              <ColumnTransferList
-                columns={headers}
-              />
-            ) : ( <p>테이블을 먼저 조회해주세요.</p> )}
+          <Box /* ColumnTransferList wrapper */>
+            <h3>암/복호화 대상 컬럼 선택</h3>
+            <Box sx={{ flex: 1, minHeight: 0 }}>
+              {tableData.length > 0 ? (
+                <ColumnTransferList
+                  columns={headers}
+                onTargetColumnsChange={setTargetColumns}
+                />
+              ) : ( <p>테이블을 먼저 조회해주세요.</p> )}
+            </Box>
           </Box>
         </Box>
         
         <Box sx={{ flex: 1, border: '1px solid white', padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px', minHeight: 0 }}>
-          <h2>옵션 선택</h2>
-          <DistinctSelect
-            label="암/복호화 선택"
-            options={modeOptions}
-            value={selectedMode}
-            onChange={setSelectedMode}
-          />
-          <DistinctSelect
-            label="암/복호화할 정보 선택"
-            options={infoOptions}
-            value={selectedInfo}
-            onChange={setSelectedInfo}
-          />
-          <DistinctSelect
-            label="암호화 알고리즘 선택"
-            options={algorithmOptions}
-            value={selectedAlgorithm}
-            onChange={setSelectedAlgorithm}
-          />
-          <DistinctSelect
-            label="비밀번호 해시 여부 선택"
-            options={passwordHashOptions}
-            value={selectedPasswordHash}
-            onChange={handlePasswordHashChange}
-          />
+          <Box /* Options wrapper */>
+            <h2>옵션 선택</h2>
+            <DistinctSelect
+              label="암/복호화 선택"
+              options={modeOptions}
+              value={selectedMode}
+              onChange={setSelectedMode}
+            />
+            <DistinctSelect
+              label="암/복호화할 정보 선택"
+              options={infoOptions}
+              value={selectedInfo}
+              onChange={setSelectedInfo}
+            />
+            <DistinctSelect
+              label="암호화 알고리즘 선택"
+              options={algorithmOptions}
+              value={selectedAlgorithm}
+              onChange={setSelectedAlgorithm}
+            />
+            <DistinctSelect
+              label="비밀번호 해시 여부 선택"
+              options={passwordHashOptions}
+              value={selectedPasswordHash}
+              onChange={handlePasswordHashChange}
+            />
+          </Box>
 
           {/* ✅ 요청하신 Send 버튼 UI만 추가 */}
           <Button
             variant="contained"
             color="success"
             startIcon={<PlayArrowIcon />}
-            onClick={() => alert('Send 버튼 클릭!')} // 기능 없이 알림창만 띄웁니다.
-            disabled={tableData.length === 0}
+            onClick={handleSendRequest} // 기능 없이 알림창만 띄웁니다.
+            disabled={tableData.length === 0 || isProcessing}
             sx={{ mt: 'auto' }} // 버튼을 영역 하단에 배치
           >
-            Send
+            {isProcessing ? '처리 중...' : 'Send'}
           </Button>
         </Box>
       </Box>

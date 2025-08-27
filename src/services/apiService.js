@@ -35,10 +35,13 @@ export const TableDataAPI = (tableName, dbConfig) => {
   return apiClient('/api/table-data', 'POST', { tableName, db_config: dbConfig });
 };
 
-
 /**
  * 테이블에 새로운 데이터를 추가하는 API
  */
 export const addNewDataAPI = (tableName, dbConfig, newData) => {
   return apiClient('/api/new-data', 'POST', { tableName, db_config: dbConfig, data: newData });
+};
+
+export const ProcessAPI = (securityData, dbConfig) => {
+  return apiClient('/api/process', 'POST', { data: securityData, db_config: dbConfig });
 };
