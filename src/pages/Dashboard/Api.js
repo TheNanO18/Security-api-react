@@ -130,7 +130,7 @@ function Api() {
 
       {/* 1. 왼쪽 영역 (80%) */}
       <Box sx={{ flex: '0 0 80%', border: '1px solid white', padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px', minHeight: 0 }}>
-        <h2>DB 테이블 (Api)</h2>
+        <h2>API 암/복호화</h2>
         <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', gap: '10px' }}>
           <TextField
             label="조회할 테이블 명을 입력하세요"

@@ -26,11 +26,12 @@ export function useLogin() {
 
     try {
       // ✅ fetch를 직접 사용하는 대신, 만들어둔 loginAPI 함수를 호출
-      const isLoginSuccessful = await loginAPI(id, password);
+      const token = await loginAPI(id, password);
 
-      if (isLoginSuccessful) {
+      if (token) {
         login();
         setPassword('');
+        localStorage.setItem('authToken', token);
         navigate('/dashboard');
       } else {
         setPassword('');
