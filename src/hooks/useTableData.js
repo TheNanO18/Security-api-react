@@ -50,11 +50,19 @@ export const useTableData = () => {
         }
     }, [dbConfig]);
 
+    const clearTable = () => {
+        setTableData([]);
+        setHeaders([]);
+        setError(null);
+    };
+
   return { 
     tableData, 
+    setTableData,
     headers, 
     isLoading,
     error, 
-    getTable 
+    getTable,
+    clearTable
   };
 };

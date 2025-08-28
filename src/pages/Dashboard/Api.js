@@ -2,7 +2,6 @@ import React, { useState, useMemo, useEffect } from 'react'; // ✅ useEffect �
 import ColumnTransferList from '../../components/ColumnTransferList';
 import DistinctSelect from '../../components/DistinctSelect';
 import AddDataModal from '../../components/AddDataModal';
-import { addNewDataAPI } from '../../services/apiService';
 import { useDbContext } from '../../context/DbContext';
 import { useTableData } from '../../hooks/useTableData';
 import { useSecurityData } from '../../hooks/useSecurityData';
@@ -61,12 +60,13 @@ const algoInModalOptions = [
 
 function Api() {
     const { dbConfig } = useDbContext();
-    const { tableData, headers, isLoading, error, getTable } = useTableData();
+    const { tableData, setTableData, headers, isLoading, error, getTable } = useTableData();
     const { processData, isLoading: isProcessing } = useSecurityData();
     
     const [tableName, setTableName] = useState('');
     const [selectedUuids, setSelectedUuids] = useState([]);
     const [targetColumns, setTargetColumns] = useState([]);
+    
     
     // 오른쪽 패널 상태
     const [selectedMode, setSelectedMode] = useState('');
@@ -105,7 +105,7 @@ function Api() {
           alert('데이터 테이블에서 암/복호화할 행을 먼저 선택해주세요.');
           return;
       }
-      if (targetColumns.length === 0) {
+      if (targetColumns.length === 0 && selectedMode === 'en') {
           alert('암/복호화 대상 컬럼을 선택해주세요.');
           return;
       }
@@ -132,6 +132,13 @@ function Api() {
                 column   : passwordColumn
             };
         }
+        if (selectedInfo === 'new') {
+            // ✅ 2. currentRow에서 uuid를 제외한 모든 속성을 dataPayload 객체로 복사합니다.
+            const { uuid, ...dataPayload } = currentRow;
+            
+            // ✅ 3. 생성된 dataPayload 객체를 requestObject의 data 속성으로 할당합니다.
+            requestObject.data = dataPayload;
+        }
 
         return requestObject;
         }).filter(Boolean);
@@ -152,20 +159,14 @@ function Api() {
         }
     };
 
-    const handleSaveNewData = async (newData) => {
-      try {
-        await addNewDataAPI(tableName.toLowerCase(), dbConfig, newData);
-        alert('데이터가 성공적으로 추가되었습니다.');
+    const handleSaveNewData = (newData) => {
+        setTableData(prevData => [
+            ...prevData, 
+            { ...newData, uuid: crypto.randomUUID() }
+        ]);
         handleCloseAddModal();
-        
-        // ✅ Clear selections before refetching data
-        setSelectedUuids([]); 
-        
-        getTable(tableName);
-       } catch (err) {
-           alert(`데이터 추가 실패: ${err.message}`);
-       }
     };
+    
     const columns = useMemo(() => {
         if (!headers || headers.length === 0) return [];
         return headers.map((header) => ({
