@@ -1,10 +1,11 @@
-import React, { useState, useMemo, useEffect } from 'react'; // ✅ useEffect 임포트
+import React, { useState, useMemo, useEffect } from 'react';
 import ColumnTransferList from '../../components/ColumnTransferList';
 import DistinctSelect from '../../components/DistinctSelect';
 import AddDataModal from '../../components/AddDataModal';
 import { useDbContext } from '../../context/DbContext';
 import { useTableData } from '../../hooks/useTableData';
 import { useSecurityData } from '../../hooks/useSecurityData';
+import shieldImage from '../../assets/background.jpg'; // 이미지 경로는 실제 프로젝트에 맞게 수정해주세요.
 
 import { DataGrid } from '@mui/x-data-grid';
 import Paper from '@mui/material/Paper';
@@ -60,13 +61,12 @@ const algoInModalOptions = [
 
 function Api() {
     const { dbConfig } = useDbContext();
-    const { tableData, setTableData, headers, isLoading, error, getTable } = useTableData();
+    const { tableData, setTableData, headers, isLoading, error, getTable, clearTable } = useTableData();
     const { processData, isLoading: isProcessing } = useSecurityData();
     
     const [tableName, setTableName] = useState('');
     const [selectedUuids, setSelectedUuids] = useState([]);
     const [targetColumns, setTargetColumns] = useState([]);
-    
     
     // 오른쪽 패널 상태
     const [selectedMode, setSelectedMode] = useState('');
@@ -89,9 +89,9 @@ function Api() {
     // 페이지네이션 상태
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 5 });
 
-    // ✅ State Synchronization Effect
-    // This effect ensures the selection is always valid when the data changes.
+    // 데이터 변경 시 선택 상태를 안전하게 동기화하는 Effect
     useEffect(() => {
+        if (!tableData) return;
         const currentRowIds = new Set(tableData.map(row => row.uuid));
         const validSelectedUuids = selectedUuids.filter(id => currentRowIds.has(id));
 
@@ -100,58 +100,64 @@ function Api() {
         }
     }, [tableData, selectedUuids]);
 
+    // 최종 "SEND" 버튼 로직
     const handleSendRequest = () => {
-      if (selectedUuids.length === 0) {
-          alert('데이터 테이블에서 암/복호화할 행을 먼저 선택해주세요.');
-          return;
-      }
-      if (targetColumns.length === 0 && selectedMode === 'en') {
-          alert('암/복호화 대상 컬럼을 선택해주세요.');
-          return;
-      }
-      const tableDataMap = new Map(tableData.map(row => [row.uuid, row]));
-      
-      const columnsString = targetColumns.join(', ')
-      const finalPayload = selectedUuids.map(uuid => {
-        const currentRow = tableDataMap.get(uuid);
-        if (!currentRow) return null; // Safety check in case the row is not found
+        if (selectedUuids.length === 0) {
+            alert('데이터 테이블에서 암/복호화할 행을 먼저 선택해주세요.');
+            return;
+        }
+        if (targetColumns.length === 0) {
+            alert('암/복호화 대상 컬럼을 선택해주세요.');
+            return;
+        }
+        const tableDataMap = new Map(tableData.map(row => [row.uuid, row]));
+        const columnsString = targetColumns.join(', ');
 
-        const requestObject  = {
-            route_type: "api",
-            table     : tableName.toLowerCase(),
-            mode      : selectedMode,
-            info_type : selectedInfo,
-            uuid      : uuid,
-            col       : columnsString,
-            algo      : selectedAlgorithm,
-        };
-        if (selectedPasswordHash === 'T') {
-            requestObject.password = {
-                pass_algo: algoInModal,
-                value    : currentRow[passwordColumn] || "", 
-                column   : passwordColumn
+        const finalPayload = selectedUuids.map(uuid => {
+            const currentRow = tableDataMap.get(uuid);
+            if (!currentRow) return null;
+
+            const requestObject = {
+                route_type: "api",
+                table: tableName.toLowerCase(),
+                mode: selectedMode,
+                info_type: selectedInfo,
+                uuid: uuid,
+                update: 'T', // update 여부 필요 시 추가
             };
-        }
-        if (selectedInfo === 'new') {
-            // ✅ 2. currentRow에서 uuid를 제외한 모든 속성을 dataPayload 객체로 복사합니다.
-            const { uuid, ...dataPayload } = currentRow;
             
-            // ✅ 3. 생성된 dataPayload 객체를 requestObject의 data 속성으로 할당합니다.
-            requestObject.data = dataPayload;
-        }
+            if (selectedMode === 'en') {
+                requestObject.col = columnsString;
+                requestObject.algo = selectedAlgorithm;
+            }
 
-        return requestObject;
+            if (selectedPasswordHash === 'T') {
+                requestObject.password = {
+                    pass_algo: algoInModal,
+                    value: currentRow[passwordColumn] || "",
+                    column: passwordColumn
+                };
+            }
+
+            if (selectedInfo === 'new') {
+                const { uuid, ...dataPayload } = currentRow;
+                requestObject.data = dataPayload;
+            }
+            return requestObject;
         }).filter(Boolean);
 
         processData(finalPayload, dbConfig);
     };
 
+    // 테이블 검색 핸들러
     const handleSubmit = (event) => {
         event.preventDefault();
         setSelectedUuids([]);
+        clearTable();
         getTable(tableName);
     };
     
+    // 비밀번호 해시 여부 변경 핸들러
     const handlePasswordHashChange = (newValue) => {
         setSelectedPasswordHash(newValue);
         if (newValue === 'T') {
@@ -159,22 +165,23 @@ function Api() {
         }
     };
 
+    // "New Data" 모달 저장 핸들러 (UI에만 임시 추가)
     const handleSaveNewData = (newData) => {
         setTableData(prevData => [
-            ...prevData, 
+            ...prevData,
             { ...newData, uuid: crypto.randomUUID() }
         ]);
         handleCloseAddModal();
     };
     
+    // DataGrid 컬럼 정의
     const columns = useMemo(() => {
         if (!headers || headers.length === 0) return [];
         return headers.map((header) => ({
             field: header,
             headerName: header.charAt(0).toUpperCase() + header.slice(1),
-            width: header === 'uuid' ? 300 : 150,
-
             flex: 1,
+            minWidth: header === 'uuid' ? 250 : 150,
         }));
     }, [headers]);
 
@@ -190,7 +197,20 @@ function Api() {
         }}>
 
             {/* 1. 왼쪽 영역 (80%) */}
-            <Box sx={{ flex: '0 0 80%', border: '1px solid white', padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px', minHeight: 0 }}>
+            <Box sx={{
+                flex: '0 0 80%',
+                border: '1px solid white',
+                padding: '20px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '20px',
+                minHeight: 0,
+                minWidth: 0,
+                backgroundImage: tableData && tableData.length > 0 ? 'none' : `url(${shieldImage})`,
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                backgroundSize: '30%',
+            }}>
                 <h2>API 암/복호화</h2>
                 <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', gap: '10px' }}>
                     <TextField
@@ -215,7 +235,7 @@ function Api() {
                         variant="outlined"
                         startIcon={<AddIcon />}
                         onClick={handleOpenAddModal}
-                        disabled={!tableData || tableData.length === 0}
+                        disabled={!headers || headers.length === 0}
                     >
                         New Data
                     </Button>
@@ -224,7 +244,14 @@ function Api() {
                 {error && <p style={{ color: 'red' }}>{error}</p>}
                 
                 {tableData && tableData.length > 0 && (
-                    <Paper sx={{ flex: 1, minHeight: 0, backgroundColor: 'rgba(255, 255, 255, 0.1)', display: 'flex', flexDirection: 'column' }}>
+                    <Paper sx={{
+                        flex: 1,
+                        minHeight: 0,
+                        minWidth: 0,
+                        backgroundColor: 'rgba(25, 28, 36, 0.85)',
+                        display: 'flex',
+                        flexDirection: 'column'
+                    }}>
                         <DataGrid
                             rows={tableData}
                             columns={columns}
@@ -233,16 +260,16 @@ function Api() {
                             onPaginationModelChange={setPaginationModel}
                             pageSizeOptions={[5, 10, 20]}
                             checkboxSelection
-                            onRowSelectionModelChange={(newSelectionModel) => {
-                                setSelectedUuids(newSelectionModel);
-                            }}
-                            rowSelectionModel={selectedUuids} // ✅ 이제 안전하게 사용 가능
-                            sx={{ 
+                            onRowSelectionModelChange={setSelectedUuids}
+                            rowSelectionModel={selectedUuids}
+                            sx={{
                                 flex: 1,
-                                color: 'white', 
-                                border: 0, 
-                                '& .MuiDataGrid-cell, & .MuiDataGrid-columnHeaders': { borderColor: 'rgba(255, 255, 255, 0.3)'}, 
+                                color: 'white',
+                                border: 0,
+                                '& .MuiDataGrid-cell, & .MuiDataGrid-columnHeaders': { borderColor: 'rgba(255, 255, 255, 0.3)' },
                                 '& .MuiSvgIcon-root': { color: 'white' },
+                                '& .MuiTablePagination-displayedRows': { color: 'white' },
+                                '& .MuiTablePagination-select, & .MuiTablePagination-selectIcon': { color: 'white' },
                             }}
                         />
                     </Paper>
@@ -259,7 +286,7 @@ function Api() {
                                 columns={headers}
                                 onTargetColumnsChange={setTargetColumns}
                             />
-                        ) : ( <p>테이블을 먼저 조회해주세요.</p> )}
+                        ) : (<p>테이블을 먼저 조회해주세요.</p>)}
                     </Box>
                 </Box>
                 
